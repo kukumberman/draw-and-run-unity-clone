@@ -22,8 +22,8 @@ public class TrajectoryPath
 
         for (int i = 0; i < points.Count - 1; i++)
         {
-            Vector2 a = Points.ElementAt(i);
-            Vector2 b = Points.ElementAt(i + 1);
+            Vector3 a = Points.ElementAt(i);
+            Vector3 b = Points.ElementAt(i + 1);
             float percentage01 = temp / d;
 
             Point p = new Point(a, percentage01, temp);
@@ -38,11 +38,11 @@ public class TrajectoryPath
 
     public class Point
     {
-        public Vector2 Position { get; }
+        public Vector3 Position { get; }
         public float Percentage01 { get; }
         public float Length { get; }
 
-        public Point(Vector2 position, float percentage01, float length)
+        public Point(Vector3 position, float percentage01, float length)
         {
             Position = position;
             Percentage01 = percentage01;
@@ -73,7 +73,7 @@ public class TrajectoryPath
         for (int i = 0; i < count; i++)
         {
             float t = i * stepSize;
-            Vector2 evaluated = Evaluate(t);
+            Vector3 evaluated = Evaluate(t);
             result[i] = evaluated;
         }
 

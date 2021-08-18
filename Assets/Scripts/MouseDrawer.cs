@@ -14,16 +14,15 @@ public class MouseDrawer : MonoBehaviour
             Points = points;
         }
     }
+
     public event Action<OnPointsGeneratedEventArgs> OnPointsGenerated = null;
 
     [SerializeField] private RectTransform m_RectTransform = null;
-    [SerializeField] private bool m_IsInside = false;
+    [SerializeField] private float m_DistanceThreshold = 10;
 
     private bool m_IsDrawing = false;
 
     private List<Vector2> m_Points = new List<Vector2>();
-
-    private float m_DistanceThreshold = 10;
 
     private void Update()
     {
@@ -35,7 +34,10 @@ public class MouseDrawer : MonoBehaviour
         {
             m_IsDrawing = false;
 
-            OnPointsGenerated?.Invoke(new OnPointsGeneratedEventArgs(m_Points));
+            if (m_Points.Count >= 2)
+            {
+                OnPointsGenerated?.Invoke(new OnPointsGeneratedEventArgs(m_Points));
+            }
 
             m_Points.Clear();
         }
@@ -46,48 +48,71 @@ public class MouseDrawer : MonoBehaviour
         }
     }
 
-    public static Vector3 ScreenToWorld(Vector3 screenPoint)
+    //public static Vector3 ScreenToWorld(Vector3 screenPoint)
+    //{
+    //    Plane xy = new Plane(Vector3.forward, Vector3.zero);
+    //    Ray ray = Camera.main.ScreenPointToRay(screenPoint);
+    //    xy.Raycast(ray, out float enter);
+    //    Vector3 point = ray.GetPoint(enter);
+    //    return point;
+    //}
+
+    //private void OnDrawGizmos()
+    //{
+    //    if (!Application.isPlaying) return;
+
+    //    Gizmos.color = Color.red;
+
+    //    for (int i = 0; i < m_Points.Count - 1; i++)
+    //    {
+    //        Vector3 a = ScreenToWorld(m_Points[i]);
+    //        Vector3 b = ScreenToWorld(m_Points[i + 1]);
+    //        Gizmos.DrawLine(a, b);
+    //    }
+    //}
+
+    private Vector2 GetPosition01(Vector3 screenPosition)
     {
-        Plane xy = new Plane(Vector3.forward, Vector3.zero);
-        Ray ray = Camera.main.ScreenPointToRay(screenPoint);
-        xy.Raycast(ray, out float enter);
-        Vector3 point = ray.GetPoint(enter);
-        return point;
-    }
+        //Vector2 position = m_RectTransform.position;
+        //Vector2 size = m_RectTransform.sizeDelta * FindObjectOfType<Canvas>().scaleFactor;
+        //Vector2 horizontal = new Vector2(position.x - size.x / 2, position.x + size.x / 2);
+        //Vector2 vertical = new Vector2(position.y - size.y / 2, position.y + size.y / 2);
 
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying) return;
+        Vector3[] corners = new Vector3[4];
+        m_RectTransform.GetWorldCorners(corners);
 
-        Gizmos.color = Color.red;
+        Vector2 horizontal = new Vector2(corners[0].x, corners[3].x);
+        Vector2 vertical = new Vector2(corners[0].y, corners[1].y);
 
-        for (int i = 0; i < m_Points.Count - 1; i++)
-        {
-            Vector3 a = ScreenToWorld(m_Points[i]);
-            Vector3 b = ScreenToWorld(m_Points[i + 1]);
-            Gizmos.DrawLine(a, b);
-        }
+        Vector2 position01 = new Vector2(
+            Mathf.InverseLerp(horizontal.x, horizontal.y, screenPosition.x),
+            Mathf.InverseLerp(vertical.x, vertical.y, screenPosition.y)
+        );
+
+        return position01;
     }
 
     private void HandleDrawing(Vector3 screenPosition)
     {
-        m_IsInside = RectTransformUtility.RectangleContainsScreenPoint(m_RectTransform, screenPosition);
+        bool inInside = RectTransformUtility.RectangleContainsScreenPoint(m_RectTransform, screenPosition);
 
-        if (!m_IsInside)
+        if (!inInside)
         {
             return;
         }
 
+        Vector3 pos = GetPosition01(screenPosition);
+
         if (m_Points.Count == 0)
         {
-            m_Points.Add(screenPosition);
+            m_Points.Add(pos);
         }
         else
         {
             Vector3 last = m_Points[m_Points.Count - 1];
-            if (Vector3.Distance(screenPosition, last) > m_DistanceThreshold)
+            if (Vector3.Distance(pos, last) > m_DistanceThreshold * 0.01f)
             {
-                m_Points.Add(screenPosition);
+                m_Points.Add(pos);
             }
         }
     }
