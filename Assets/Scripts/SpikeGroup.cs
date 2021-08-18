@@ -9,6 +9,8 @@ public class SpikeGroup : MonoBehaviour
     [SerializeField] private SpikeObject m_SpikePrefab = null;
     [SerializeField] private SpikeObject[] m_Spikes = null;
 
+    public bool IsAcive => m_IsActive;
+
     private void Start()
     {
         SpawnGrid();

@@ -5,17 +5,7 @@ using UnityEngine;
 
 public class MouseDrawer : MonoBehaviour
 {
-    public class OnPointsGeneratedEventArgs
-    {
-        public List<Vector2> Points { get; }
-
-        public OnPointsGeneratedEventArgs(List<Vector2> points)
-        {
-            Points = points;
-        }
-    }
-
-    public event Action<OnPointsGeneratedEventArgs> OnPointsGenerated = null;
+    public event Action OnPointsGenerated = null;
 
     [SerializeField] private RectTransform m_RectTransform = null;
     [SerializeField] private float m_DistanceThreshold = 10;
@@ -24,10 +14,14 @@ public class MouseDrawer : MonoBehaviour
 
     private List<Vector2> m_Points = new List<Vector2>();
 
+    public List<Vector2> Points => m_Points;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
+            m_Points.Clear();
+
             m_IsDrawing = true;
         }
         else if (Input.GetKeyUp(KeyCode.Mouse0))
@@ -36,10 +30,8 @@ public class MouseDrawer : MonoBehaviour
 
             if (m_Points.Count >= 2)
             {
-                OnPointsGenerated?.Invoke(new OnPointsGeneratedEventArgs(m_Points));
+                OnPointsGenerated?.Invoke();
             }
-
-            m_Points.Clear();
         }
 
         if (m_IsDrawing)

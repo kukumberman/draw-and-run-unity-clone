@@ -1,11 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using System;
+using UnityEngine;
 
 public class DudeSpawner : MonoBehaviour
 {
-    [SerializeField] private int m_Count = 10;
+    public class OnDudeSpawnedEventArgs
+    {
+        public DudeObject Dude { get; }
+
+        public OnDudeSpawnedEventArgs(DudeObject dude)
+        {
+            Dude = dude;
+        }
+    }
+
+    public event Action<OnDudeSpawnedEventArgs> OnDudeSpawned = null;
+
+    [SerializeField] private DudeObject m_DudePrefab = null;
+    [Space]
     [SerializeField] private Vector3 m_Center = Vector3.zero;
     [SerializeField] private Vector2 m_Size = Vector2.one;
 
@@ -13,19 +27,11 @@ public class DudeSpawner : MonoBehaviour
 
     private Vector3[] m_Points = new Vector3[0];
 
+    private List<DudeObject> m_Dudes = new List<DudeObject>();
+
     private void Awake()
     {
         m_Drawer = FindObjectOfType<MouseDrawer>();
-    }
-
-    private void OnEnable()
-    {
-        m_Drawer.OnPointsGenerated += OnPointsGenerated;
-    }
-
-    private void OnDisable()
-    {
-        m_Drawer.OnPointsGenerated -= OnPointsGenerated;
     }
 
     private void OnDrawGizmos()
@@ -57,6 +63,41 @@ public class DudeSpawner : MonoBehaviour
         //}
     }
 
+    public void RecalculatePosition(int count)
+    {
+        List<Vector3> points = m_Drawer.Points
+            .Select(v2 => ConvertPoint(v2))
+            .ToList();
+
+        m_Points = new TrajectoryPath(points).Subdivide(count).ToArray();
+
+        for (int i = 0; i < m_Dudes.Count; i++)
+        {
+            DudeObject dude = m_Dudes[i];
+            dude.transform.position = m_Points[i];
+        }
+    }
+
+    public void SpawnAt(Vector3 position)
+    {
+        DudeObject dude = Instantiate(m_DudePrefab, position, Quaternion.identity, transform);
+
+        dude.OnSpikeCollision += OnSpikeRemoveDude;
+
+        m_Dudes.Add(dude);
+
+        OnDudeSpawned?.Invoke(new OnDudeSpawnedEventArgs(dude));
+    }
+
+    private void OnSpikeRemoveDude(DudeObject.OnSpikeCollisionEventArgs args)
+    {
+        args.Sender.OnSpikeCollision -= OnSpikeRemoveDude;
+
+        m_Dudes.Remove(args.Sender);
+
+        Destroy(args.Sender.gameObject);
+    }
+
     private void GetCorners(Vector3[] corners)
     {
         // bl, tl, tr, br;
@@ -67,15 +108,6 @@ public class DudeSpawner : MonoBehaviour
         corners[1] = m_Center + new Vector3(-halfSize.x, 0, halfSize.y);
         corners[2] = m_Center + new Vector3(halfSize.x, 0, halfSize.y);
         corners[3] = m_Center + new Vector3(halfSize.x, 0, -halfSize.y);
-    }
-
-    private void OnPointsGenerated(MouseDrawer.OnPointsGeneratedEventArgs args)
-    {
-        List<Vector3> points = args.Points
-            .Select(v2 => ConvertPoint(v2))
-            .ToList();
-
-        m_Points = new TrajectoryPath(points).Subdivide(m_Count).ToArray();
     }
 
     private Vector3 ConvertPoint(Vector2 point01)
