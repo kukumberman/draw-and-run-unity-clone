@@ -11,11 +11,13 @@ public class DudeController : MonoBehaviour
 
     private MouseDrawer m_Drawer = null;
     private DudeSpawner m_DudeSpawner = null;
+    private DrawAndRun m_Game = null;
 
     private void Awake()
     {
         m_Drawer = FindObjectOfType<MouseDrawer>();
         m_DudeSpawner = FindObjectOfType<DudeSpawner>();
+        m_Game = FindObjectOfType<DrawAndRun>();
     }
 
     private void OnEnable()
@@ -63,7 +65,7 @@ public class DudeController : MonoBehaviour
 
         if (m_Count == 0)
         {
-            Debug.Log("game finished - bad");
+            m_Game.FinishGame(false);
         }
     }
 

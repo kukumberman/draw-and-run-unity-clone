@@ -7,7 +7,7 @@ public class Wallet : MonoBehaviour
 {
     public event Action OnCoinAmountChanged = null;
 
-    [SerializeField] private int m_CoinAmount = 0;
+    private int m_CoinAmount = 0;
 
     public int CoinAmount
     {
@@ -17,5 +17,10 @@ public class Wallet : MonoBehaviour
             m_CoinAmount = value;
             OnCoinAmountChanged?.Invoke();
         }
+    }
+
+    private void Start()
+    {
+        CoinAmount = 0;
     }
 }
