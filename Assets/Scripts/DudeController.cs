@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(GridPlacement))]
 public class DudeController : MonoBehaviour
 {
     [SerializeField] private int m_Count = 10;
@@ -21,7 +22,6 @@ public class DudeController : MonoBehaviour
     {
         m_Drawer.OnPointsGenerated += RecalculatePositions;
         m_DudeSpawner.OnDudeSpawned += OnDudeSpawned;
-
     }
 
     private void OnDisable()
@@ -53,8 +53,6 @@ public class DudeController : MonoBehaviour
         m_Count += 1;
 
         args.Dude.OnSpikeCollision += OnDudeSpikeCollision;
-
-        //todo: recalculate position;
     }
 
     private void OnDudeSpikeCollision(DudeObject.OnSpikeCollisionEventArgs args)
@@ -66,10 +64,6 @@ public class DudeController : MonoBehaviour
         if (m_Count == 0)
         {
             Debug.Log("game finished - bad");
-        }
-        else
-        {
-            //RecalculatePositions();
         }
     }
 

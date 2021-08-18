@@ -26,9 +26,9 @@ public class DudeObject : MonoBehaviour
                 OnSpikeCollision?.Invoke(new OnSpikeCollisionEventArgs(this));
             }
         }
-        else if (other.TryGetComponent<PickableCoin>(out var coin))
+        else if (other.TryGetComponent<PickableItem>(out var item))
         {
-            coin.Pickup();
+            item.Pickup();
         }
     }
 }

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickableCoin : MonoBehaviour
+public class PickableCoin : PickableItem
 {
     [SerializeField] private int m_Amount = 1;
 
-    public void Pickup()
+    public override void Pickup()
     {
         var wallet = FindObjectOfType<Wallet>();
         if (wallet)
