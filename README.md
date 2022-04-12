@@ -1,10 +1,31 @@
 # draw-and-run-unity-clone
 
+## Description
+
+Unity developer position assessment task
+
 [Original game](https://play.google.com/store/apps/details?id=com.butchersgames.drawandrun)
 
-<hr>
-<img src="readme-content/Screenshot_1.png" />
-<hr>
-https://user-images.githubusercontent.com/53304126/130035639-4e083ca1-f8fe-4cc8-b9de-1b98361a8440.mp4
-<hr>
-<img src="readme-content/Screenshot_2.png" />
+<table>
+  <tr>
+    <td>
+      <img src="./readme-content/Screenshot_1.png" />
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./readme-content/preview_1.webp" />
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./readme-content/preview_2.webp" />
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <!-- being mad at pendejo for dumbest feedback I've ever seen -->
+      <img src="readme-content/Screenshot_2.png" />
+    </td>
+  </tr>
+</table>
